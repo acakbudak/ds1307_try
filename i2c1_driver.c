@@ -2,7 +2,7 @@
  * i2c1_driver.c
  *
  *  Created on: 24 Oca 2020
- *      Author: lenovo
+ *      Author: ACAKBUDAK
  */
 
 #include "i2c1_driver.h"
@@ -78,7 +78,7 @@ void ack_enable(uint8_t EnorDi)
 		I2C1->CR1 |= (I2C1_ACK_DISABLE << 10);
 
 }
-void i2c1_master_send(uint8_t Txbuffer, uint32_t Len, uint8_t SlaveAddr,uint8_t Sr)
+void i2c1_master_send(uint8_t *pTxbuffer, uint32_t Len, uint8_t SlaveAddr,uint8_t Sr)
 {
 	// 1. Generate the START condition
 	start_transmission();
@@ -95,8 +95,18 @@ void i2c1_master_send(uint8_t Txbuffer, uint32_t Len, uint8_t SlaveAddr,uint8_t 
 	//5. clear the ADDR flag according to its software sequence
 	ADDR_FLAG_CLEAR();
 
-	I2C1->DR = Txbuffer;
+	if(Len==1)
+	I2C1->DR = *pTxbuffer;
 
+	if(Len>1)
+	{
+		for(uint8_t i=0; i<2;i++)
+		{
+			while(!(I2C1->SR1 & I2C1_TXE_FLAG));
+			I2C1->DR = *pTxbuffer;
+			pTxbuffer++;
+		}
+	}
 	stop_transmission();
 
 
@@ -136,7 +146,5 @@ void i2c1_master_recieve(uint32_t Len, uint8_t SlaveAddr,uint8_t Sr)
 	ack_enable(ENABLE);
 
 	(void)Rxbuffer;
-
-	I2C1->CR1 &= ~(1 << I2C1_STOP);
 
 }
