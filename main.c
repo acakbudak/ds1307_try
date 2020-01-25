@@ -2,14 +2,16 @@
  * main.c
  *
  *  Created on: 24 Oca 2020
- *      Author: lenovo
+ *      Author: ACAKBUDAK
  */
 
 #include "F446RE.h"
+#include<stdio.h>
+#include<string.h>
 
-uint8_t data1=0x01;
-uint8_t data2=0x04;
-uint8_t data3=0x05;
+uint8_t SetMuniteData[2];
+uint8_t SetPointer[1];
+
 
 int main(void)
 {
@@ -17,11 +19,14 @@ int main(void)
 
 	ack_enable(ENABLE);
 
-	i2c1_master_send(data2,1,0x68,0);
-	i2c1_master_recieve(1,0x68,0);
-	i2c1_master_send(data2,1,0x68,0);
-	i2c1_master_recieve(1,0x68,0);
-	i2c1_master_send(data3,1,0x68,0);
+	SetMuniteData[0]=0x00;
+	SetMuniteData[1]=0x24;
+	SetPointer[0]=0x00;
+
+	i2c1_master_send((uint8_t*)SetMuniteData, 2,0x68,1);
+
+	i2c1_master_send((uint8_t*)SetPointer, 1,0x68,1);
+
 	i2c1_master_recieve(1,0x68,0);
 
 
